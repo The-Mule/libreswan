@@ -39,6 +39,7 @@
 #include "instantiate.h"
 #include "ikev2_states.h"
 #include "peer_id.h"
+#include "ikev2_auth.h"
 
 #define TS_MAX 16 /* arbitrary */
 
@@ -1524,6 +1525,13 @@ bool process_v2TS_request_payloads(struct child_sa *child,
 		       best.connection->name, pri_so(best.connection->serialno),
 		       (is_template(best.connection) ? " needs instantiating!" : ""),
 		       (is_group_instance(best.connection) ? " group-instance!" : ""));
+
+		if (best.connection != child->sa.st_connection) {
+			struct ike_sa *ike = ike_sa(&child->sa, HERE);
+			if (has_competing_ike_auth(best.connection, ike, md)) {
+				return false;
+			}
+		}
 	}
 
 	/*

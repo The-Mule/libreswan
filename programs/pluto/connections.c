@@ -4894,6 +4894,12 @@ static diag_t extract_connection(const struct whack_message *wm,
 			   wm->send_esp_tfc_padding_not_supported,
 			   YN_NO, wm, c->logger);
 
+	if (wm->allow_competing_ike_auth && ike_version < IKEv2) {
+		return diag("cannot specify allow-competing-ike-auth for IKEv1");
+	}
+	config->allow_competing_ike_auth = extract_yn("", "allow-competing-ike-auth",
+			wm->allow_competing_ike_auth, /*value_when_unset*/YN_NO, wm, c->logger);
+
 	/*
 	 * Since security labels use the same REQID for everything,
 	 * pre-assign it.

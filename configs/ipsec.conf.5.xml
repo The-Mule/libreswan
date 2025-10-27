@@ -25,6 +25,7 @@
 <!ENTITY accept-redirect-to SYSTEM "d.ipsec.conf/accept-redirect-to.xml">
 <!ENTITY aggressive SYSTEM "d.ipsec.conf/aggressive.xml">
 <!ENTITY ah SYSTEM "d.ipsec.conf/ah.xml">
+<!ENTITY allow-competing-ike-auth SYSTEM "d.ipsec.conf/allow-competing-ike-auth.xml">
 <!ENTITY audit-log SYSTEM "d.ipsec.conf/audit-log.xml">
 <!ENTITY authby SYSTEM "d.ipsec.conf/authby.xml">
 <!ENTITY author SYSTEM "d.ipsec.conf/author.xml">
@@ -377,6 +378,7 @@
 	&failureshunt;
 	&negotiationshunt;
 	&debug;
+	&allow-competing-ike-auth;
       </variablelist>
     </refsect2>
   </refsect1>

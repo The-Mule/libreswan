@@ -162,6 +162,7 @@ static const struct keyword_def config_conn_keyword[] = {
 
   K("initial-contact",  LEMPTY,  kt_sparse_name,  KWYN_INITIAL_CONTACT, .sparse_names = &yn_option_names),
   K("send-esp-tfc-padding-not-supported",  LEMPTY,  kt_sparse_name,  KWYN_SEND_ESP_TFC_PADDING_NOT_SUPPORTED, .sparse_names = &yn_option_names),
+  K("allow-competing-ike-auth", LEMPTY, kt_sparse_name, KWYN_ALLOW_COMPETING_IKE_AUTH, .sparse_names = &yn_option_names),
 
   K("iptfs",  LEMPTY,  kt_sparse_name,  KWYN_IPTFS, .sparse_names = &yn_option_names),
   K("iptfs-fragmentation",  LEMPTY,  kt_sparse_name,  KWYN_IPTFS_FRAGMENTATION, .sparse_names = &yn_option_names),

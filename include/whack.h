@@ -410,6 +410,8 @@ struct whack_message {
 	const char *tfc;
 	enum yn_options send_esp_tfc_padding_not_supported;
 
+	enum yn_options allow_competing_ike_auth;
+
 	enum yn_options iptfs;
 	enum yn_options iptfs_fragmentation;
 	const char *iptfs_packet_size; /* 0 for PMTU */

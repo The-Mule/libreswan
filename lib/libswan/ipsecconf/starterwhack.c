@@ -230,6 +230,7 @@ int starter_whack_add_conn(const char *ctlsocket,
 	msg.tfc = conn->values[KWS_TFC].string;
 	msg.send_esp_tfc_padding_not_supported =
 		conn->values[KWYN_SEND_ESP_TFC_PADDING_NOT_SUPPORTED].option;
+	msg.allow_competing_ike_auth = conn->values[KWYN_ALLOW_COMPETING_IKE_AUTH].option;
 	msg.nflog_group = conn->values[KWS_NFLOG_GROUP].string;
 	msg.reqid = conn->values[KWS_REQID].string;
 

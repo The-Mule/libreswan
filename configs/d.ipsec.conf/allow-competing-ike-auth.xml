@@ -1,0 +1,23 @@
+<varlistentry>
+  <term>
+    <option>allow-competing-ike-auth</option>
+  </term>
+  <listitem>
+
+    <para>
+      Allow competing IKE_AUTH requests when both peers simultaneously
+      initiate IKEv2 negotiations on the same connection. By default,
+      when libreswan receives IKE_AUTH request from the peer while having
+      an outstanding IKE_AUTH request, it responds with TEMPORARY_FAILURE
+      to avoid potential SA mismatch issues. This option only applies to
+      permanent IKEv2 connections so that the revival mechanism ensure
+      connection retry.
+    </para>
+
+    <para>
+      The accepted values are <option>no</option> (the default) or
+      <option>yes</option>.
+    </para>
+
+  </listitem>
+</varlistentry>

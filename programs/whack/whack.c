@@ -111,6 +111,7 @@ static void help(void)
 		"	[--mtu <mtu>] \\\n"
 		"	[--priority <prio>] [--reqid <reqid>] \\\n"
 		"	[--tfc <size>] [--send-esp-tfc-padding-not-supported] \\\n"
+		"       [--allow-competing-ike-auth] \\\n"
 		"	[--iptfs[={yes,no}] \\\n"
 		"         [--iptfs-fragmentation[={yes,no}]] \\\n"
 		"         [--iptfs-packet-size <size>] \\\n"
@@ -516,6 +517,7 @@ enum opt {
 	CD_PRIORITY,
 	CD_TFC,
 	CD_SEND_ESP_TFC_PADDING_NOT_SUPPORTED,
+	CD_ALLOW_COMPETING_IKE_AUTH,
 	CD_PFS,
 	CD_REQID,
 	CD_NFLOG_GROUP,
@@ -898,6 +900,7 @@ const struct option optarg_options[] = {
 	{ "tfc\0", required_argument, NULL, CD_TFC },
 	{ "send-esp-tfc-padding-not-supported\0yes|no", optional_argument, NULL, CD_SEND_ESP_TFC_PADDING_NOT_SUPPORTED },
 	{ "send-no-esp-tfc\0", no_argument, NULL, CD_SEND_ESP_TFC_PADDING_NOT_SUPPORTED },
+	{ "allow-competing-ike-auth\0yes|no", optional_argument, NULL, CD_ALLOW_COMPETING_IKE_AUTH },
 	{ "pfs\0", optional_argument, NULL, CD_PFS },
 	{ "reqid\01-65535", required_argument, NULL, CD_REQID },
 #ifdef USE_NFLOG
@@ -2083,6 +2086,10 @@ int main(int argc, char **argv)
 		case CD_SEND_ESP_TFC_PADDING_NOT_SUPPORTED:	/* --send-esp-tfc-padding-not-supported */
 			msg.send_esp_tfc_padding_not_supported =
 				optarg_yn(logger, YN_YES);
+			continue;
+
+		case CD_ALLOW_COMPETING_IKE_AUTH: /* --allow-competing-ike-auth */
+			msg.allow_competing_ike_auth = optarg_yn(logger, YN_YES);
 			continue;
 
 		case CD_PFS:	/* --pfs */

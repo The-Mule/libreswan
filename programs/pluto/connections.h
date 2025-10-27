@@ -431,6 +431,8 @@ struct config {
 		uint32_t id;
 	} ipsec_interface;
 
+	bool allow_competing_ike_auth; /* allow competing IKE_AUTH requests */
+
 	struct end_config end[END_ROOF];
 };
 
