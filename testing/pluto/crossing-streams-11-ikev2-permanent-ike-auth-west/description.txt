@@ -1,0 +1,6 @@
+IKEv2 permanent reject crossing outstanding IKE_AUTH requests
+
+Both sides initiate simultaneously, IKE_AUTH requests cross over the
+network. WEST should detect the simultaneous initiation and since its
+IKE_SA has lower SPI it responds AUTHENTICATION_FAILED to EAST let its
+own IKE_SA to proceed.
