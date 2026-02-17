@@ -18,10 +18,10 @@ ipsec up --asynchronous east-west
 ../../guestbin/wait-for-inbound.sh 4
 
 # Process EAST IKE_AUTH request - crossing-stream!
-# WEST IKE SA SPI is higher and hence send AUTHENTICATION_FAILED to EAST
+# WEST IKE SA SPI is lower and hence it needs to drop its IKE_SA
 ../../guestbin/drip-inbound.sh 2 '#1: IKE SA #2 has outstanding IKE_AUTH request'
-../../guestbin/wait-for-pluto.sh '#1: responding to IKE_AUTH message .* AUTHENTICATION_FAILED'
-../../guestbin/wait-for-pluto.sh '#1: deleting IKE SA'
+../../guestbin/wait-for-pluto.sh '#2: deleting IKE SA (sent IKE_AUTH request)'
 
-# Child SA established using WEST IKE SA
-../../guestbin/drip-inbound.sh 4 '#3: initiator established Child SA using #2;'
+# Child SA established using EAST IKE SA
+../../guestbin/drip-inbound.sh 4 '#4: responder established Child SA using #1;'
+
