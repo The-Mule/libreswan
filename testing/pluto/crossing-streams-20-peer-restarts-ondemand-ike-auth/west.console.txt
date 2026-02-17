@@ -25,6 +25,10 @@ west #
 west #
  ipsec route east-west
 west #
+ # Make sure WEST IKE SA nonce is lower than EAST's.
+west #
+ ipsec whack --impair ike_initiator_nonce:0x01
+west #
  # should be the trap
 west #
  ipsec _kernel policy
@@ -96,11 +100,6 @@ src 192.1.2.23 dst 192.1.2.45
 	 replay_window 128, bitmap-length 4
 	 00000000 00000000 00000000 XXXXXXXX 
 	dir in
-src 192.1.2.23 dst 192.1.2.45
-	proto esp spi 0xSPISPI reqid REQID mode transport
-	replay-window 0 
-	dir in
-	sel src 192.1.2.23/32 dst 192.1.2.45/32 
 src 192.0.1.254 dst 192.0.2.254
 	proto esp spi 0x00000000 reqid 0 mode transport
 	replay-window 0 

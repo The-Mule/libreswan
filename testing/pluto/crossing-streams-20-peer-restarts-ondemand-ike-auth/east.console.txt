@@ -16,6 +16,10 @@ east #
 east #
  ipsec whack --impair suppress_retransmits
 east #
+ # Make sure EAST IKE SA nonce is higher thant WEST's.
+east #
+ ipsec whack --impair ike_initiator_nonce:0xff
+east #
  ipsec auto --add east-west
 "east-west": added oriented IKEv2 connection
 east #

@@ -1,14 +1,10 @@
-#
-# set up east
-#
-
-/testing/guestbin/swan-prep --nokeys
+/testing/guestbin/swan-prep
 ipsec start
 ../../guestbin/wait-until-pluto-started
 ipsec whack --impair revival
 ipsec whack --impair suppress_retransmits
-
-# Make sure EAST IKE SA nonce is higher thant WEST's.
-ipsec whack --impair ike_initiator_nonce:0xff
-
+ipsec whack --impair block_inbound:yes
 ipsec auto --add east-west
+
+# Make sure WEST IKE SA nonce is higher than EAST's.
+ipsec whack --impair ike_initiator_nonce:0xff

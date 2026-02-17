@@ -1,0 +1,34 @@
+/testing/guestbin/swan-prep
+east #
+ ipsec start
+Redirecting to: [initsystem]
+east #
+ ../../guestbin/wait-until-pluto-started
+east #
+ ipsec whack --impair revival
+east #
+ ipsec whack --impair suppress_retransmits
+east #
+ ipsec auto --add east-west
+"east-west": added oriented IKEv2 connection
+east #
+ # Make sure EAST IKE SA nonce is higher thant WEST's.
+east #
+ ipsec whack --impair ike_initiator_nonce:0xff
+east #
+ ipsec up --asynchronous east-west
+"east-west" #1: initiating IKEv2 connection to 192.1.2.45 using UDP
+east #
+ ../../guestbin/ping-once.sh --up -I 192.0.2.254 192.0.1.254
+up
+east #
+<<<<<<< HEAD:testing/pluto/crossing-streams-11-wwewe-ikev2-permanent/east.console.txt
+ ipsec showstates
+#2: "east-west":500 established IKE SA; RETRANSMIT in XXs; REKEY in XXs; REPLACE in XXs; newest; idle;
+#4: "east-west":500 sent CREATE_CHILD_SA request for new IPsec SA; eroute owner; idle;
+east #
+=======
+>>>>>>> 8524640ab1 (testing: tests for simultaneous IKE_AUTH exchange):testing/pluto/crossing-streams-11-ikev2-permanent-ike-auth-east/east.console.txt
+ ipsec trafficstatus
+#2: "east-west", type=ESP, add_time=1234567890, inBytes=0, outBytes=0, maxBytes=2^63B, id='@west'
+east #
