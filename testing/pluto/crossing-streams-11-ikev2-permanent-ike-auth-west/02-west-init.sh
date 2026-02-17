@@ -6,5 +6,5 @@ ipsec whack --impair suppress_retransmits
 ipsec whack --impair block_inbound:yes
 ipsec auto --add east-west
 
-# Make sure WEST IKE SA SPI is lower.
-ipsec whack --impair ike_initiator_spi:0x1
+# Make sure WEST IKE SA SPI is higher.
+ipsec whack --impair ike_initiator_spi:0xffffffff
