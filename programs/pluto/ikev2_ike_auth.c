@@ -680,20 +680,20 @@ stf_status process_v2_IKE_AUTH_request_standard_payloads(struct ike_sa *ike, str
 
 	const struct connection *c = ike->sa.st_connection;
 
-	/* If initiator has another IKE SA with IKE_AUTH request
-	 * outstanding for the same permanent connection (or recently
-	 * established one) then we keep only one of them. This is to
-	 * prevent potential crossing streams scenario.
-	 */
-	struct ike_sa *ike_to_reject = check_simultaneous_ike_auth(c, ike, md);
-	if (ike_to_reject == ike) {
-		/* Reject current IKE_AUTH request */
-		record_v2N_response(ike->sa.logger, ike, md, v2N_AUTHENTICATION_FAILED, empty_shunk, ENCRYPTED_PAYLOAD);
-		return STF_FATAL;
-	} else if (ike_to_reject != NULL) {
-		/* Terminate the other IKE SA, continue with current */
-		terminate_ike_family(&ike_to_reject, REASON_SUPERSEDED_BY_NEW_SA, HERE);
-	}
+//	/* If initiator has another IKE SA with IKE_AUTH request
+//	 * outstanding for the same permanent connection (or recently
+//	 * established one) then we keep only one of them. This is to
+//	 * prevent potential crossing streams scenario.
+//	 */
+//	struct ike_sa *ike_to_reject = check_simultaneous_ike_auth(c, ike, md);
+//	if (ike_to_reject == ike) {
+//		/* Reject current IKE_AUTH request */
+//		record_v2N_response(ike->sa.logger, ike, md, v2N_AUTHENTICATION_FAILED, empty_shunk, ENCRYPTED_PAYLOAD);
+//		return STF_FATAL;
+//	} else if (ike_to_reject != NULL) {
+//		/* Terminate the other IKE SA, continue with current */
+//		terminate_ike_family(&ike_to_reject, REASON_SUPERSEDED_BY_NEW_SA, HERE);
+//	}
 
 	/*
 	 * This both decodes the initiator's ID and, when necessary,
