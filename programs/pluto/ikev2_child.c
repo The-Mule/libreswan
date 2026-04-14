@@ -1059,7 +1059,6 @@ static v2_notification_t process_v2_IKE_AUTH_request_child_sa_payloads(struct ik
 	struct ike_sa *ike_to_reject = check_simultaneous_ike_auth(child->sa.st_connection, ike, md);
 	if (ike_to_reject == ike) {
 		/* Reject current IKE_AUTH request */
-		record_v2N_response(ike->sa.logger, ike, md, v2N_AUTHENTICATION_FAILED, empty_shunk, ENCRYPTED_PAYLOAD);
 		return v2N_AUTHENTICATION_FAILED;
 	} else if (ike_to_reject != NULL) {
 		/* Terminate the other IKE SA, continue with current */
