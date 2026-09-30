@@ -148,6 +148,18 @@ static bool EDDSA_authenticate_message_signature_1(const struct pubkey_signer *s
 		LDBG_hunk(logger, &message);
 	}
 
+	/*
+	 * PK11_Verify() does not apply NSS's key-size policy; enforce
+	 * it here (delegating the actual minimums to NSS).
+	 */
+	diag_t key_size_diag = enforce_nss_key_size_policy(pubkey->content.public_key);
+	if (key_size_diag != NULL) {
+		llog(RC_LOG, logger, "%s", str_diag(key_size_diag));
+		pfree_diag(&key_size_diag);
+		*fatal_diag = NULL;
+		return false;
+	}
+
 	PRArenaPool *arena = PORT_NewArena(DER_DEFAULT_CHUNKSIZE);
 	if (arena == NULL) {
 		*fatal_diag = diag_nss_error("allocating EDDSA arena");

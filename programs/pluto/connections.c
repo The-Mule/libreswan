@@ -83,7 +83,6 @@
 #include "nss_cert_load.h"
 #include "ikev2.h"
 #include "virtual_ip.h"	/* needs connections.h */
-#include "fips_mode.h"
 #include "crypto.h"
 #include "kernel_xfrm.h"
 #include "ip_address.h"
@@ -718,26 +717,13 @@ diag_t add_end_cert_and_preload_private_key(CERTCertificate *cert,
 	const char *leftright = host_end_config->leftright;
 
 	/*
-	 * A copy of this code lives in nss_cert_verify.c :/
-	 * Currently only a check for RSA is needed, as the only ECDSA
-	 * key size not allowed in FIPS mode (p192 curve), is not implemented
-	 * by NSS.
-	 * See also RSA_secret_sane() and ECDSA_secret_sane()
+	 * The key-size policy (including the FIPS minimum key sizes) is
+	 * enforced by NSS itself when the key is used for a
+	 * cryptographic operation: NSS consults NSS_RSA_MIN_KEY_SIZE /
+	 * NSS_DSA_MIN_KEY_SIZE / NSS_ECC_MIN_KEY_SIZE (driven by the
+	 * system crypto-policy) via SECKEY_EnforceKeySize().  Pluto
+	 * therefore no longer duplicates that policy here.
 	 */
-	if (is_fips_mode()) {
-		SECKEYPublicKey *pk = CERT_ExtractPublicKey(cert);
-		PASSERT(logger, pk != NULL);
-		if (pk->keyType == rsaKey &&
-		    ((pk->u.rsa.modulus.len * BITS_IN_BYTE) < FIPS_MIN_RSA_KEY_SIZE)) {
-			SECKEY_DestroyPublicKey(pk);
-			return diag("FIPS: rejecting %s certificate '%s' with key size %d which is under %d",
-				    leftright, nickname,
-				    pk->u.rsa.modulus.len * BITS_IN_BYTE,
-				    FIPS_MIN_RSA_KEY_SIZE);
-		}
-		/* TODO FORCE MINIMUM SIZE ECDSA KEY */
-		SECKEY_DestroyPublicKey(pk);
-	}
 
 	/* check validity of cert */
 	SECCertTimeValidity validity = CERT_CheckCertValidTimes(cert, PR_Now(), false);

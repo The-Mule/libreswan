@@ -399,3 +399,39 @@ void seed_prng(struct logger *logger)
 	messupn(buf, seedbytes);
 	pfree(buf);
 }
+
+diag_t enforce_nss_key_size_policy(SECKEYPublicKey *public_key)
+{
+	/*
+	 * Delegate the minimum-key-size policy (including the FIPS
+	 * minimums) to NSS.  SECKEY_EnforceKeySize() consults the NSS
+	 * options NSS_RSA_MIN_KEY_SIZE, NSS_DSA_MIN_KEY_SIZE,
+	 * NSS_DH_MIN_KEY_SIZE and NSS_ECC_MIN_KEY_SIZE, which are driven
+	 * by the system crypto-policy.
+	 *
+	 * NSS applies this policy itself inside the high-level cryptohi
+	 * (VFY and SGN) and certificate (CERT_PKIXVerifyCert) APIs, but
+	 * NOT in the raw PK11_Sign()/PK11_Verify() layer.  Pluto uses
+	 * that raw layer for several IKE AUTH signature schemes, so the
+	 * check has to be made here (gated on
+	 * NSS_KEY_SIZE_POLICY_VERIFY_FLAG), exactly like NSS's own SSL
+	 * code does when it bypasses the wrappers (see
+	 * ssl3_SignHashesWithPrivKey() in NSS's lib/ssl/ssl3con.c).
+	 */
+	PRInt32 policy_flags;
+	if (NSS_OptionGet(NSS_KEY_SIZE_POLICY_FLAGS, &policy_flags) != SECSuccess) {
+		/* no key-size policy configured; nothing to enforce */
+		return NULL;
+	}
+	if ((policy_flags & NSS_KEY_SIZE_POLICY_VERIFY_FLAG) == 0) {
+		return NULL;
+	}
+
+	unsigned key_size = SECKEY_PublicKeyStrengthInBits(public_key);
+	if (SECKEY_EnforceKeySize(public_key->keyType, key_size,
+				  SEC_ERROR_INVALID_KEY) != SECSuccess) {
+		return diag_nss_error("rejecting %u-bit key", key_size);
+	}
+
+	return NULL;
+}

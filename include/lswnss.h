@@ -150,4 +150,14 @@ SECItem same_shunk_as_secitem(shunk_t chunk, SECItemType type); /* NSS doesn't d
 /* this clones */
 chunk_t clone_secitem_as_chunk(SECItem si, const char *name);
 
+/*
+ * Enforce NSS's minimum-key-size policy (RSA/DSA/DH/ECC, driven by the
+ * system crypto-policy) on PUBLIC_KEY.  Needed when a public key is used
+ * via the raw PK11_Sign()/PK11_Verify() layer, which - unlike the
+ * high-level cryptohi and certificate APIs - does not apply the policy
+ * itself.  Returns NULL when the key is acceptable (or no policy is
+ * configured), otherwise a diag_t describing the rejection.
+ */
+diag_t enforce_nss_key_size_policy(SECKEYPublicKey *public_key);
+
 #endif

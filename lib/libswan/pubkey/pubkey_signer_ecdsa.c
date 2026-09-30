@@ -100,6 +100,18 @@ static bool ECDSA_raw_authenticate_hash_signature(const struct pubkey_signer *si
 	const struct pubkey_content *ecdsa = &kr->content;
 
 	/*
+	 * PK11_Verify() does not apply NSS's key-size policy; enforce
+	 * it here (delegating the actual minimums to NSS).
+	 */
+	diag_t key_size_diag = enforce_nss_key_size_policy(ecdsa->public_key);
+	if (key_size_diag != NULL) {
+		llog(RC_LOG, logger, "%s", str_diag(key_size_diag));
+		pfree_diag(&key_size_diag);
+		*fatal_diag = NULL;
+		return false;
+	}
+
+	/*
 	 * Turn the signature and hash into SECItem/s (NSS doesn't do
 	 * const, but it does pretend).
 	 */

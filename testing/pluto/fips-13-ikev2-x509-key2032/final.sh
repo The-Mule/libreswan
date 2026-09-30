@@ -1,1 +1,1 @@
-grep '^[^|].*FIPS: ' /tmp/pluto.log
+grep '^[^|].*NSS: rejecting .*-bit key' /tmp/pluto.log

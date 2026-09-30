@@ -83,6 +83,18 @@ static bool RSA_authenticate_hash_signature_raw_rsa(const struct pubkey_signer *
 		return false;
 	}
 
+	/*
+	 * PK11_Verify() does not apply NSS's key-size policy; enforce
+	 * it here (delegating the actual minimums to NSS).
+	 */
+	diag_t key_size_diag = enforce_nss_key_size_policy(seckey_public);
+	if (key_size_diag != NULL) {
+		llog(RC_LOG, logger, "%s", str_diag(key_size_diag));
+		pfree_diag(&key_size_diag);
+		*fatal_diag = NULL;
+		return false;
+	}
+
  	if (LDBGP(DBG_BASE, logger)) {
 		LDBG_log(logger, "NSS: %s: verifying that signature (once decrypted):", signer->name);
 		LDBG_hunk(logger, &signature);
@@ -287,6 +299,19 @@ static bool RSA_authenticate_hash_signature_rsassa_pss(const struct pubkey_signe
 	/* decrypt the signature -- reversing RSA_sign_hash */
 	if (signature.len != (size_t)seckey_public->u.rsa.modulus.len) {
 		/* XXX notification: INVALID_KEY_INFORMATION */
+		*fatal_diag = NULL;
+		return false;
+	}
+
+	/*
+	 * PK11_VerifyWithMechanism() does not apply NSS's key-size
+	 * policy; enforce it here (delegating the actual minimums to
+	 * NSS).
+	 */
+	diag_t key_size_diag = enforce_nss_key_size_policy(seckey_public);
+	if (key_size_diag != NULL) {
+		llog(RC_LOG, logger, "%s", str_diag(key_size_diag));
+		pfree_diag(&key_size_diag);
 		*fatal_diag = NULL;
 		return false;
 	}

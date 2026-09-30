@@ -32,7 +32,6 @@
 #include "constants.h"
 #include "x509.h"
 #include "nss_cert_verify.h"
-#include "fips_mode.h" /* for is_fips_mode() */
 #include "certs.h"
 #include <secder.h>
 #include <secerr.h>
@@ -341,10 +340,6 @@ static bool crl_update_check(CERTCertDBHandle *handle,
  * CERTS array.
  */
 
-static void add_decoded_cert_1(struct certs **certs,
-			       struct logger *logger,
-			       CERTCertificate *cert);
-
 static void add_decoded_cert(CERTCertDBHandle *handle,
 			     struct certs **certs,
 			     SECItem der_cert,
@@ -407,51 +402,20 @@ static void add_decoded_cert(CERTCertDBHandle *handle,
 	}
 	ldbg(logger, "decoded cert: %s", cert->subjectName);
 
-	add_decoded_cert_1(certs, logger, cert); /* adds ref when needed */
-	CERT_DestroyCertificate(cert); /* local reference */
-}
-
-static void add_decoded_cert_1(struct certs **certs,
-			       struct logger *logger,
-			       CERTCertificate *cert)
-{
-	/*
-	 * Currently only a check for RSA is needed, as the only ECDSA
-	 * key size not allowed in FIPS mode (p192 curve), is not
-	 * implemented by NSS.
-	 *
-	 * XXX: While NSS should be the one making this check, as of
-	 * 2026-08 and version 3.125, NSS allows undersized certs in
-	 * FIPS mode.
-	 *
-	 * See also RSA_secret_sane() and ECDSA_secret_sane()
-	 */
-	if (is_fips_mode()) {
-		SECKEYPublicKey *pk = CERT_ExtractPublicKey(cert);
-		if (pk == NULL) {
-			llog_nss_error(RC_LOG, logger,
-				       "extracting certificate public key using CERT_ExtractPublicKey() failed");
-			return;
-		}
-
-		if (pk->keyType == rsaKey) {
-			unsigned key_bit_size = pk->u.rsa.modulus.len * BITS_IN_BYTE;
-			if (key_bit_size < FIPS_MIN_RSA_KEY_SIZE) {
-				llog(RC_LOG, logger,
-				     "FIPS: rejecting peer cert with key size %u under %u: %s",
-				     key_bit_size, FIPS_MIN_RSA_KEY_SIZE,
-				     cert->subjectName);
-				SECKEY_DestroyPublicKey(pk);
-				return;
-			}
-		}
-		SECKEY_DestroyPublicKey(pk);
-	}
-
 	/*
 	 * Add a reference to the certificate to the CERTS array.
+	 *
+	 * NSS enforces the key-size policy (including the FIPS minimum
+	 * key sizes) itself while verifying the certificate chain in
+	 * verify_end_cert() -> CERT_PKIXVerifyCert().  See
+	 * checkKeyParams() in NSS's lib/certhigh/certvfy.c which
+	 * consults NSS_RSA_MIN_KEY_SIZE / NSS_DSA_MIN_KEY_SIZE (driven
+	 * by the system crypto-policy) when
+	 * NSS_KEY_SIZE_POLICY_VERIFY_FLAG is set.  Pluto therefore no
+	 * longer duplicates that policy here.
 	 */
-	add_cert(certs, cert);
+	add_cert(certs, cert); /* adds ref when needed */
+	CERT_DestroyCertificate(cert); /* local reference */
 }
 
 /*
